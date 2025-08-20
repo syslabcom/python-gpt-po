@@ -179,6 +179,11 @@ def main():
     """
     Main function to parse arguments and initiate processing.
     """
+    print("-------------------------------")
+    print("- Plone Compatibility Version -")
+    print("-------------------------------")
+    print("See https://github.com/syslabcom/python-gpt-po/tree/plone-compatibility \n")
+
     # Show help if no arguments
     if len(sys.argv) == 1:
         show_help_and_exit()
