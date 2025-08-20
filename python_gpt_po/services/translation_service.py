@@ -232,6 +232,7 @@ class TranslationService:
                 "Each translation should be concise and direct, without explanations or additional context. "
                 "Keep special characters, placeholders, and formatting intact. "
                 "If a term should not be translated (like 'URL' or technical terms), keep it as is. "
+                "Do not translate anything within curly brackets { and } "
                 "Example format: [\"Translation 1\", \"Translation 2\", ...]\n\n"
                 "Texts to translate:\n"
             )
@@ -729,7 +730,15 @@ class TranslationService:
     def _prepare_translation_request(self, po_file, po_file_path, file_lang, detail_languages):
         """Prepare a translation request from PO file data."""
         entries = [entry for entry in po_file if is_entry_untranslated(entry)]
-        texts = [entry.msgid for entry in entries]
+
+        def extract_text(entry):
+            comment_pattern = r'Default:\s*"([^"]*)"'
+            match = re.search(comment_pattern, entry.comment, re.DOTALL)
+            if match:
+                return (match.group(1).replace("\n", " "))
+            return entry.msgid
+
+        texts = [extract_text(entry) for entry in entries]
         detail_lang = detail_languages.get(file_lang) if detail_languages else None
 
         return TranslationRequest(
